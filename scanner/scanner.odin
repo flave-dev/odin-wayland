@@ -427,7 +427,7 @@ generate_code :: proc(protocol: Protocol, package_name, output_path, wayland_dir
                fmt.sbprintln(&sb, "/*", event.description, "*/")
 
                fmt.sbprint(&sb, "\t")
-               fmt.sbprintf(&sb,`%v : proc "c" (data: rawptr, %v: ^%v`, event.name, interface.name, interface.name)
+               fmt.sbprintf(&sb,`%v : proc "c" (data: rawptr, %v_: ^%v`, event.name, interface.name, interface.name)
                for arg, i in event.args {
                   fmt.sbprintf(&sb, ", %v",get_argument_text(arg, true))
 
