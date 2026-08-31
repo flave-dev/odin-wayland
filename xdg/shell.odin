@@ -103,14 +103,14 @@ wm_base_listener :: struct {
 
 	A compositor is free to ping in any way it wants, but a client must
 	always respond to any xdg_wm_base object it created. */
-	ping : proc "c" (data: rawptr, wm_base: ^wm_base, serial_: uint),
+	ping : proc "c" (data: rawptr, wm_base_: ^wm_base, serial_: uint),
 
 }
 wm_base_add_listener :: proc "contextless" (wm_base_: ^wm_base, listener: ^wm_base_listener, data: rawptr) {
 	proxy_add_listener(cast(^proxy)wm_base_, cast(^generic_c_call)listener,data)
 }
 /*  */
-wm_base_error :: enum {
+wm_base_error :: enum u32 {
 	role = 0,
 	defunct_surfaces = 1,
 	not_the_topmost_popup = 2,
@@ -230,8 +230,8 @@ positioner_set_gravity :: proc "contextless" (positioner_: ^positioner, gravity_
 
 	The default adjustment is none. */
 POSITIONER_SET_CONSTRAINT_ADJUSTMENT :: 5
-positioner_set_constraint_adjustment :: proc "contextless" (positioner_: ^positioner, constraint_adjustment_: positioner_constraint_adjustment) {
-	proxy_marshal_flags(cast(^proxy)positioner_, POSITIONER_SET_CONSTRAINT_ADJUSTMENT, nil, proxy_get_version(cast(^proxy)positioner_), 0, constraint_adjustment_)
+positioner_set_constraint_adjustment :: proc "contextless" (positioner_: ^positioner, constraint_adjustment_: positioner_constraint_adjustment_flags) {
+	proxy_marshal_flags(cast(^proxy)positioner_, POSITIONER_SET_CONSTRAINT_ADJUSTMENT, nil, proxy_get_version(cast(^proxy)positioner_), 0, transmute(u32)constraint_adjustment_)
 }
 
 /* Specify the surface position offset relative to the position of the
@@ -283,11 +283,11 @@ positioner_set_parent_configure :: proc "contextless" (positioner_: ^positioner,
 }
 
 /*  */
-positioner_error :: enum {
+positioner_error :: enum u32 {
 	invalid_input = 0,
 }
 /*  */
-positioner_anchor :: enum {
+positioner_anchor :: enum u32 {
 	none = 0,
 	top = 1,
 	bottom = 2,
@@ -299,7 +299,7 @@ positioner_anchor :: enum {
 	bottom_right = 8,
 }
 /*  */
-positioner_gravity :: enum {
+positioner_gravity :: enum u32 {
 	none = 0,
 	top = 1,
 	bottom = 2,
@@ -321,7 +321,7 @@ positioner_gravity :: enum {
 
 	The adjustments can be combined, according to a defined precedence: 1)
 	Flip, 2) Slide, 3) Resize. */
-positioner_constraint_adjustment :: enum {
+positioner_constraint_adjustment :: enum u32 {
 	none = 0,
 	slide_x = 1,
 	slide_y = 2,
@@ -330,6 +330,7 @@ positioner_constraint_adjustment :: enum {
 	resize_x = 16,
 	resize_y = 32,
 }
+positioner_constraint_adjustment_flags :: bit_set[positioner_constraint_adjustment; u32]
 @(private)
 positioner_requests := []message {
 	{"destroy", "", raw_data(xdg_shell_types)[0:]},
@@ -532,14 +533,14 @@ surface_listener :: struct {
 
 	If the client receives multiple configure events before it can respond
 	to one, it is free to discard all but the last event it received. */
-	configure : proc "c" (data: rawptr, surface: ^surface, serial_: uint),
+	configure : proc "c" (data: rawptr, surface_: ^surface, serial_: uint),
 
 }
 surface_add_listener :: proc "contextless" (surface_: ^surface, listener: ^surface_listener, data: rawptr) {
 	proxy_add_listener(cast(^proxy)surface_, cast(^generic_c_call)listener,data)
 }
 /*  */
-surface_error :: enum {
+surface_error :: enum u32 {
 	not_constructed = 1,
 	already_constructed = 2,
 	unconfigured_buffer = 3,
@@ -948,7 +949,7 @@ toplevel_listener :: struct {
 
 	Clients must send an ack_configure in response to this event. See
 	xdg_surface.configure and xdg_surface.ack_configure for details. */
-	configure : proc "c" (data: rawptr, toplevel: ^toplevel, width_: int, height_: int, states_: array),
+	configure : proc "c" (data: rawptr, toplevel_: ^toplevel, width_: int, height_: int, states_: array),
 
 /* The close event is sent by the compositor when the user
 	wants the surface to be closed. This should be equivalent to
@@ -958,7 +959,7 @@ toplevel_listener :: struct {
 	This is only a request that the user intends to close the
 	window. The client may choose to ignore this request, or show
 	a dialog to ask the user to save their data, etc. */
-	close : proc "c" (data: rawptr, toplevel: ^toplevel),
+	close : proc "c" (data: rawptr, toplevel_: ^toplevel),
 
 /* The configure_bounds event may be sent prior to a xdg_toplevel.configure
 	event to communicate the bounds a window geometry size is recommended
@@ -975,7 +976,7 @@ toplevel_listener :: struct {
 	The bounds may change at any point, and in such a case, a new
 	xdg_toplevel.configure_bounds will be sent, followed by
 	xdg_toplevel.configure and xdg_surface.configure. */
-	configure_bounds : proc "c" (data: rawptr, toplevel: ^toplevel, width_: int, height_: int),
+	configure_bounds : proc "c" (data: rawptr, toplevel_: ^toplevel, width_: int, height_: int),
 
 /* This event advertises the capabilities supported by the compositor. If
 	a capability isn't supported, clients should hide or disable the UI
@@ -997,21 +998,21 @@ toplevel_listener :: struct {
 
 	The capabilities are sent as an array of 32-bit unsigned integers in
 	native endianness. */
-	wm_capabilities : proc "c" (data: rawptr, toplevel: ^toplevel, capabilities_: array),
+	wm_capabilities : proc "c" (data: rawptr, toplevel_: ^toplevel, capabilities_: array),
 
 }
 toplevel_add_listener :: proc "contextless" (toplevel_: ^toplevel, listener: ^toplevel_listener, data: rawptr) {
 	proxy_add_listener(cast(^proxy)toplevel_, cast(^generic_c_call)listener,data)
 }
 /*  */
-toplevel_error :: enum {
+toplevel_error :: enum u32 {
 	invalid_resize_edge = 0,
 	invalid_parent = 1,
 	invalid_size = 2,
 }
 /* These values are used to indicate which edge of a surface
 	is being dragged in a resize operation. */
-toplevel_resize_edge :: enum {
+toplevel_resize_edge :: enum u32 {
 	none = 0,
 	top = 1,
 	bottom = 2,
@@ -1028,7 +1029,7 @@ toplevel_resize_edge :: enum {
 	setting the state can be synchronized.
 
 	States set in this way are double-buffered, see wl_surface.commit. */
-toplevel_state :: enum {
+toplevel_state :: enum u32 {
 	maximized = 1,
 	fullscreen = 2,
 	resizing = 3,
@@ -1044,7 +1045,7 @@ toplevel_state :: enum {
 	constrained_bottom = 13,
 }
 /*  */
-toplevel_wm_capabilities :: enum {
+toplevel_wm_capabilities :: enum u32 {
 	window_menu = 1,
 	maximize = 2,
 	fullscreen = 3,
@@ -1204,12 +1205,12 @@ popup_listener :: struct {
 	ever sent once for the initial configuration. Starting with version 3,
 	it may be sent again if the popup is setup with an xdg_positioner with
 	set_reactive requested, or in response to xdg_popup.reposition requests. */
-	configure : proc "c" (data: rawptr, popup: ^popup, x_: int, y_: int, width_: int, height_: int),
+	configure : proc "c" (data: rawptr, popup_: ^popup, x_: int, y_: int, width_: int, height_: int),
 
 /* The popup_done event is sent out when a popup is dismissed by the
 	compositor. The client should destroy the xdg_popup object at this
 	point. */
-	popup_done : proc "c" (data: rawptr, popup: ^popup),
+	popup_done : proc "c" (data: rawptr, popup_: ^popup),
 
 /* The repositioned event is sent as part of a popup configuration
 	sequence, together with xdg_popup.configure and lastly
@@ -1226,14 +1227,14 @@ popup_listener :: struct {
 	The client should optionally update the content of the popup, but must
 	acknowledge the new popup configuration for the new position to take
 	effect. See xdg_surface.ack_configure for details. */
-	repositioned : proc "c" (data: rawptr, popup: ^popup, token_: uint),
+	repositioned : proc "c" (data: rawptr, popup_: ^popup, token_: uint),
 
 }
 popup_add_listener :: proc "contextless" (popup_: ^popup, listener: ^popup_listener, data: rawptr) {
 	proxy_add_listener(cast(^proxy)popup_, cast(^generic_c_call)listener,data)
 }
 /*  */
-popup_error :: enum {
+popup_error :: enum u32 {
 	invalid_grab = 0,
 }
 @(private)

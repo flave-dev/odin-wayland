@@ -141,7 +141,7 @@ linux_dmabuf_v1_listener :: struct {
         Starting version 4, the format event is deprecated and must not be
         sent by compositors. Instead, use get_default_feedback or
         get_surface_feedback. */
-	format : proc "c" (data: rawptr, linux_dmabuf_v1: ^linux_dmabuf_v1, format_: uint),
+	format : proc "c" (data: rawptr, linux_dmabuf_v1_: ^linux_dmabuf_v1, format_: uint),
 
 /* This event advertises the formats that the server supports, along with
         the modifiers supported for each format. All the supported modifiers
@@ -166,7 +166,7 @@ linux_dmabuf_v1_listener :: struct {
         Starting version 4, the modifier event is deprecated and must not be
         sent by compositors. Instead, use get_default_feedback or
         get_surface_feedback. */
-	modifier : proc "c" (data: rawptr, linux_dmabuf_v1: ^linux_dmabuf_v1, format_: uint, modifier_hi_: uint, modifier_lo_: uint),
+	modifier : proc "c" (data: rawptr, linux_dmabuf_v1_: ^linux_dmabuf_v1, format_: uint, modifier_hi_: uint, modifier_lo_: uint),
 
 }
 linux_dmabuf_v1_add_listener :: proc "contextless" (linux_dmabuf_v1_: ^linux_dmabuf_v1, listener: ^linux_dmabuf_v1_listener, data: rawptr) {
@@ -304,8 +304,8 @@ linux_buffer_params_v1_add :: proc "contextless" (linux_buffer_params_v1_: ^linu
         It is not mandatory to issue 'create'. If a client wants to
         cancel the buffer creation, it can just destroy this object. */
 LINUX_BUFFER_PARAMS_V1_CREATE :: 2
-linux_buffer_params_v1_create :: proc "contextless" (linux_buffer_params_v1_: ^linux_buffer_params_v1, width_: int, height_: int, format_: uint, flags_: linux_buffer_params_v1_flags) {
-	proxy_marshal_flags(cast(^proxy)linux_buffer_params_v1_, LINUX_BUFFER_PARAMS_V1_CREATE, nil, proxy_get_version(cast(^proxy)linux_buffer_params_v1_), 0, width_, height_, format_, flags_)
+linux_buffer_params_v1_create :: proc "contextless" (linux_buffer_params_v1_: ^linux_buffer_params_v1, width_: int, height_: int, format_: uint, flags_: linux_buffer_params_v1_flags_flags) {
+	proxy_marshal_flags(cast(^proxy)linux_buffer_params_v1_, LINUX_BUFFER_PARAMS_V1_CREATE, nil, proxy_get_version(cast(^proxy)linux_buffer_params_v1_), 0, width_, height_, format_, transmute(u32)flags_)
 }
 
 /* This asks for immediate creation of a wl_buffer by importing the
@@ -332,8 +332,8 @@ linux_buffer_params_v1_create :: proc "contextless" (linux_buffer_params_v1_: ^l
         This takes the same arguments as a 'create' request, and obeys the
         same restrictions. */
 LINUX_BUFFER_PARAMS_V1_CREATE_IMMED :: 3
-linux_buffer_params_v1_create_immed :: proc "contextless" (linux_buffer_params_v1_: ^linux_buffer_params_v1, width_: int, height_: int, format_: uint, flags_: linux_buffer_params_v1_flags) -> ^wl.buffer {
-	ret := proxy_marshal_flags(cast(^proxy)linux_buffer_params_v1_, LINUX_BUFFER_PARAMS_V1_CREATE_IMMED, &wl.buffer_interface, proxy_get_version(cast(^proxy)linux_buffer_params_v1_), 0, nil, width_, height_, format_, flags_)
+linux_buffer_params_v1_create_immed :: proc "contextless" (linux_buffer_params_v1_: ^linux_buffer_params_v1, width_: int, height_: int, format_: uint, flags_: linux_buffer_params_v1_flags_flags) -> ^wl.buffer {
+	ret := proxy_marshal_flags(cast(^proxy)linux_buffer_params_v1_, LINUX_BUFFER_PARAMS_V1_CREATE_IMMED, &wl.buffer_interface, proxy_get_version(cast(^proxy)linux_buffer_params_v1_), 0, nil, width_, height_, format_, transmute(u32)flags_)
 	return cast(^wl.buffer)ret
 }
 
@@ -343,7 +343,7 @@ linux_buffer_params_v1_listener :: struct {
 
         Upon receiving this event, the client should destroy the
         zwp_linux_buffer_params_v1 object. */
-	created : proc "c" (data: rawptr, linux_buffer_params_v1: ^linux_buffer_params_v1) -> ^wl.buffer,
+	created : proc "c" (data: rawptr, linux_buffer_params_v1_: ^linux_buffer_params_v1, buffer_: ^wl.buffer),
 
 /* This event indicates that the attempted buffer creation has
         failed. It usually means that one of the dmabuf constraints
@@ -351,14 +351,14 @@ linux_buffer_params_v1_listener :: struct {
 
         Upon receiving this event, the client should destroy the
         zwp_linux_buffer_params_v1 object. */
-	failed : proc "c" (data: rawptr, linux_buffer_params_v1: ^linux_buffer_params_v1),
+	failed : proc "c" (data: rawptr, linux_buffer_params_v1_: ^linux_buffer_params_v1),
 
 }
 linux_buffer_params_v1_add_listener :: proc "contextless" (linux_buffer_params_v1_: ^linux_buffer_params_v1, listener: ^linux_buffer_params_v1_listener, data: rawptr) {
 	proxy_add_listener(cast(^proxy)linux_buffer_params_v1_, cast(^generic_c_call)listener,data)
 }
 /*  */
-linux_buffer_params_v1_error :: enum {
+linux_buffer_params_v1_error :: enum u32 {
 	already_used = 0,
 	plane_idx = 1,
 	plane_set = 2,
@@ -369,11 +369,12 @@ linux_buffer_params_v1_error :: enum {
 	invalid_wl_buffer = 7,
 }
 /*  */
-linux_buffer_params_v1_flags :: enum {
+linux_buffer_params_v1_flags :: enum u32 {
 	y_invert = 1,
 	interlaced = 2,
 	bottom_first = 4,
 }
+linux_buffer_params_v1_flags_flags :: bit_set[linux_buffer_params_v1_flags; u32]
 @(private)
 linux_buffer_params_v1_requests := []message {
 	{"destroy", "", raw_data(linux_dmabuf_v1_types)[0:]},
@@ -437,7 +438,7 @@ linux_dmabuf_feedback_v1_listener :: struct {
 
         This allows changes to the wp_linux_dmabuf_feedback parameters to be
         seen as atomic, even if they happen via multiple events. */
-	done : proc "c" (data: rawptr, linux_dmabuf_feedback_v1: ^linux_dmabuf_feedback_v1),
+	done : proc "c" (data: rawptr, linux_dmabuf_feedback_v1_: ^linux_dmabuf_feedback_v1),
 
 /* This event provides a file descriptor which can be memory-mapped to
         access the format and modifier table.
@@ -453,7 +454,7 @@ linux_dmabuf_feedback_v1_listener :: struct {
         event has been sent. Instead, compositors must create a new, separate
         table file and re-send feedback parameters. Compositors are allowed to
         store duplicate format + modifier pairs in the table. */
-	format_table : proc "c" (data: rawptr, linux_dmabuf_feedback_v1: ^linux_dmabuf_feedback_v1, fd_: int, size_: uint),
+	format_table : proc "c" (data: rawptr, linux_dmabuf_feedback_v1_: ^linux_dmabuf_feedback_v1, fd_: int, size_: uint),
 
 /* This event advertises the main device that the server prefers to use
         when direct scan-out to the target device isn't possible. The
@@ -478,13 +479,13 @@ linux_dmabuf_feedback_v1_listener :: struct {
         If explicit modifiers are not supported and the client performs buffer
         allocations on a different device than the main device, then the client
         must force the buffer to have a linear layout. */
-	main_device : proc "c" (data: rawptr, linux_dmabuf_feedback_v1: ^linux_dmabuf_feedback_v1, device_: array),
+	main_device : proc "c" (data: rawptr, linux_dmabuf_feedback_v1_: ^linux_dmabuf_feedback_v1, device_: array),
 
 /* This event splits tranche_target_device and tranche_formats events in
         preference tranches. It is sent after a set of tranche_target_device
         and tranche_formats events; it represents the end of a tranche. The
         next tranche will have a lower preference. */
-	tranche_done : proc "c" (data: rawptr, linux_dmabuf_feedback_v1: ^linux_dmabuf_feedback_v1),
+	tranche_done : proc "c" (data: rawptr, linux_dmabuf_feedback_v1_: ^linux_dmabuf_feedback_v1),
 
 /* This event advertises the target device that the server prefers to use
         for a buffer created given this tranche. The advertised target device
@@ -512,7 +513,7 @@ linux_dmabuf_feedback_v1_listener :: struct {
         comparing the dev_t value.
 
         This event is tied to a preference tranche, see the tranche_done event. */
-	tranche_target_device : proc "c" (data: rawptr, linux_dmabuf_feedback_v1: ^linux_dmabuf_feedback_v1, device_: array),
+	tranche_target_device : proc "c" (data: rawptr, linux_dmabuf_feedback_v1_: ^linux_dmabuf_feedback_v1, device_: array),
 
 /* This event advertises the format + modifier combinations that the
         compositor supports.
@@ -538,7 +539,7 @@ linux_dmabuf_feedback_v1_listener :: struct {
 
         For the definition of the format and modifier codes, see the
         wp_linux_buffer_params.create request. */
-	tranche_formats : proc "c" (data: rawptr, linux_dmabuf_feedback_v1: ^linux_dmabuf_feedback_v1, indices_: array),
+	tranche_formats : proc "c" (data: rawptr, linux_dmabuf_feedback_v1_: ^linux_dmabuf_feedback_v1, indices_: array),
 
 /* This event sets tranche-specific flags.
 
@@ -548,16 +549,17 @@ linux_dmabuf_feedback_v1_listener :: struct {
         device is implementation-defined.
 
         This event is tied to a preference tranche, see the tranche_done event. */
-	tranche_flags : proc "c" (data: rawptr, linux_dmabuf_feedback_v1: ^linux_dmabuf_feedback_v1, flags_: linux_dmabuf_feedback_v1_tranche_flags),
+	tranche_flags : proc "c" (data: rawptr, linux_dmabuf_feedback_v1_: ^linux_dmabuf_feedback_v1, flags_: linux_dmabuf_feedback_v1_tranche_flags_flags),
 
 }
 linux_dmabuf_feedback_v1_add_listener :: proc "contextless" (linux_dmabuf_feedback_v1_: ^linux_dmabuf_feedback_v1, listener: ^linux_dmabuf_feedback_v1_listener, data: rawptr) {
 	proxy_add_listener(cast(^proxy)linux_dmabuf_feedback_v1_, cast(^generic_c_call)listener,data)
 }
 /*  */
-linux_dmabuf_feedback_v1_tranche_flags :: enum {
+linux_dmabuf_feedback_v1_tranche_flags :: enum u32 {
 	scanout = 1,
 }
+linux_dmabuf_feedback_v1_tranche_flags_flags :: bit_set[linux_dmabuf_feedback_v1_tranche_flags; u32]
 @(private)
 linux_dmabuf_feedback_v1_requests := []message {
 	{"destroy", "", raw_data(linux_dmabuf_v1_types)[0:]},

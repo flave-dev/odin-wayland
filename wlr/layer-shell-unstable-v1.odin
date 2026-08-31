@@ -12,10 +12,10 @@ wlr_layer_shell_unstable_v1_types := []^interface {
 	&layer_surface_v1_interface,
 	&wl.surface_interface,
 	&wl.output_interface,
-	nil,
-	nil,
-	&xdg.popup_interface,
-}
+ 	nil,
+ 	nil,
+ 	&xdg.popup_interface,
+ }
 /* Clients can use this interface to assign the surface_layer role to
       wl_surfaces. Such surfaces are assigned to a "layer" of the output and
       rendered with a defined z-depth respective to each other. They may also be
@@ -68,7 +68,7 @@ layer_shell_v1_destroy :: proc "contextless" (layer_shell_v1_: ^layer_shell_v1) 
 }
 
 /*  */
-layer_shell_v1_error :: enum {
+layer_shell_v1_error :: enum u32 {
 	role = 0,
 	invalid_layer = 1,
 	already_constructed = 2,
@@ -79,7 +79,7 @@ layer_shell_v1_error :: enum {
         Fullscreen shell surfaces are typically rendered at the top layer.
         Multiple surfaces can share a single layer, and ordering within a
         single layer is undefined. */
-layer_shell_v1_layer :: enum {
+layer_shell_v1_layer :: enum u32 {
 	background = 0,
 	bottom = 1,
 	top = 2,
@@ -140,8 +140,8 @@ layer_surface_v1_set_size :: proc "contextless" (layer_surface_v1_: ^layer_surfa
 
         Anchor is double-buffered, see wl_surface.commit. */
 LAYER_SURFACE_V1_SET_ANCHOR :: 1
-layer_surface_v1_set_anchor :: proc "contextless" (layer_surface_v1_: ^layer_surface_v1, anchor_: layer_surface_v1_anchor) {
-	proxy_marshal_flags(cast(^proxy)layer_surface_v1_, LAYER_SURFACE_V1_SET_ANCHOR, nil, proxy_get_version(cast(^proxy)layer_surface_v1_), 0, anchor_)
+layer_surface_v1_set_anchor :: proc "contextless" (layer_surface_v1_: ^layer_surface_v1, anchor_: layer_surface_v1_anchor_flags) {
+	proxy_marshal_flags(cast(^proxy)layer_surface_v1_, LAYER_SURFACE_V1_SET_ANCHOR, nil, proxy_get_version(cast(^proxy)layer_surface_v1_), 0, transmute(u32)anchor_)
 }
 
 /* Requests that the compositor avoids occluding an area with other
@@ -265,8 +265,8 @@ layer_surface_v1_set_layer :: proc "contextless" (layer_surface_v1_: ^layer_surf
         The edge must be one the surface is anchored to, otherwise the
         invalid_exclusive_edge protocol error will be raised. */
 LAYER_SURFACE_V1_SET_EXCLUSIVE_EDGE :: 9
-layer_surface_v1_set_exclusive_edge :: proc "contextless" (layer_surface_v1_: ^layer_surface_v1, edge_: layer_surface_v1_anchor) {
-	proxy_marshal_flags(cast(^proxy)layer_surface_v1_, LAYER_SURFACE_V1_SET_EXCLUSIVE_EDGE, nil, proxy_get_version(cast(^proxy)layer_surface_v1_), 0, edge_)
+layer_surface_v1_set_exclusive_edge :: proc "contextless" (layer_surface_v1_: ^layer_surface_v1, edge_: layer_surface_v1_anchor_flags) {
+	proxy_marshal_flags(cast(^proxy)layer_surface_v1_, LAYER_SURFACE_V1_SET_EXCLUSIVE_EDGE, nil, proxy_get_version(cast(^proxy)layer_surface_v1_), 0, transmute(u32)edge_)
 }
 
 layer_surface_v1_listener :: struct {
@@ -290,14 +290,14 @@ layer_surface_v1_listener :: struct {
 
         If the width or height arguments are zero, it means the client should
         decide its own window dimension. */
-	configure : proc "c" (data: rawptr, layer_surface_v1: ^layer_surface_v1, serial_: uint, width_: uint, height_: uint),
+	configure : proc "c" (data: rawptr, layer_surface_v1_: ^layer_surface_v1, serial_: uint, width_: uint, height_: uint),
 
 /* The closed event is sent by the compositor when the surface will no
         longer be shown. The output may have been destroyed or the user may
         have asked for it to be removed. Further changes to the surface will be
         ignored. The client should destroy the resource after receiving this
         event, and create a new surface if they so choose. */
-	closed : proc "c" (data: rawptr, layer_surface_v1: ^layer_surface_v1),
+	closed : proc "c" (data: rawptr, layer_surface_v1_: ^layer_surface_v1),
 
 }
 layer_surface_v1_add_listener :: proc "contextless" (layer_surface_v1_: ^layer_surface_v1, listener: ^layer_surface_v1_listener, data: rawptr) {
@@ -308,13 +308,13 @@ layer_surface_v1_add_listener :: proc "contextless" (layer_surface_v1_: ^layer_s
         in keyboard events and not allowing them to be focused can improve the
         desktop experience; (2) some applications will want to take exclusive
         keyboard focus. */
-layer_surface_v1_keyboard_interactivity :: enum {
+layer_surface_v1_keyboard_interactivity :: enum u32 {
 	none = 0,
 	exclusive = 1,
 	on_demand = 2,
 }
 /*  */
-layer_surface_v1_error :: enum {
+layer_surface_v1_error :: enum u32 {
 	invalid_surface_state = 0,
 	invalid_size = 1,
 	invalid_anchor = 2,
@@ -322,12 +322,13 @@ layer_surface_v1_error :: enum {
 	invalid_exclusive_edge = 4,
 }
 /*  */
-layer_surface_v1_anchor :: enum {
+layer_surface_v1_anchor :: enum u32 {
 	top = 1,
 	bottom = 2,
 	left = 4,
 	right = 8,
 }
+layer_surface_v1_anchor_flags :: bit_set[layer_surface_v1_anchor; u32]
 @(private)
 layer_surface_v1_requests := []message {
 	{"set_size", "uu", raw_data(wlr_layer_shell_unstable_v1_types)[0:]},

@@ -92,7 +92,7 @@ presentation_listener :: struct {
         irrelevant. Precision of one millisecond or better is
         recommended. Clients must be able to query the current clock
         value directly, not by asking the compositor. */
-	clock_id : proc "c" (data: rawptr, presentation: ^presentation, clk_id_: uint),
+	clock_id : proc "c" (data: rawptr, presentation_: ^presentation, clk_id_: uint),
 
 }
 presentation_add_listener :: proc "contextless" (presentation_: ^presentation, listener: ^presentation_listener, data: rawptr) {
@@ -100,7 +100,7 @@ presentation_add_listener :: proc "contextless" (presentation_: ^presentation, l
 }
 /* These fatal protocol errors may be emitted in response to
         illegal presentation requests. */
-presentation_error :: enum {
+presentation_error :: enum u32 {
 	invalid_timestamp = 0,
 	invalid_flag = 1,
 }
@@ -150,7 +150,7 @@ presentation_feedback_listener :: struct {
         times, this event is sent for each bound instance that matches
         the synchronized output. If a client has not bound to the
         right wl_output global at all, this event is not sent. */
-	sync_output : proc "c" (data: rawptr, presentation_feedback: ^presentation_feedback, output_: ^wl.output),
+	sync_output : proc "c" (data: rawptr, presentation_feedback_: ^presentation_feedback, output_: ^wl.output),
 
 /* The associated content update was displayed to the user at the
         indicated time (tv_sec_hi/lo, tv_nsec). For the interpretation of
@@ -196,10 +196,10 @@ presentation_feedback_listener :: struct {
         refresh cycle, or the output device is self-refreshing without
         a way to query the refresh count, then the arguments seq_hi
         and seq_lo must be zero. */
-	presented : proc "c" (data: rawptr, presentation_feedback: ^presentation_feedback, tv_sec_hi_: uint, tv_sec_lo_: uint, tv_nsec_: uint, refresh_: uint, seq_hi_: uint, seq_lo_: uint, flags_: presentation_feedback_kind),
+	presented : proc "c" (data: rawptr, presentation_feedback_: ^presentation_feedback, tv_sec_hi_: uint, tv_sec_lo_: uint, tv_nsec_: uint, refresh_: uint, seq_hi_: uint, seq_lo_: uint, flags_: presentation_feedback_kind_flags),
 
 /* The content update was never displayed to the user. */
-	discarded : proc "c" (data: rawptr, presentation_feedback: ^presentation_feedback),
+	discarded : proc "c" (data: rawptr, presentation_feedback_: ^presentation_feedback),
 
 }
 presentation_feedback_add_listener :: proc "contextless" (presentation_feedback_: ^presentation_feedback, listener: ^presentation_feedback_listener, data: rawptr) {
@@ -209,12 +209,13 @@ presentation_feedback_add_listener :: proc "contextless" (presentation_feedback_
         the related content update was done. The intent is to help
         clients assess the reliability of the feedback and the visual
         quality with respect to possible tearing and timings. */
-presentation_feedback_kind :: enum {
+presentation_feedback_kind :: enum u32 {
 	vsync = 0x1,
 	hw_clock = 0x2,
 	hw_completion = 0x4,
 	zero_copy = 0x8,
 }
+presentation_feedback_kind_flags :: bit_set[presentation_feedback_kind; u32]
 @(private)
 presentation_feedback_events := []message {
 	{"sync_output", "o", raw_data(presentation_time_types)[9:]},
