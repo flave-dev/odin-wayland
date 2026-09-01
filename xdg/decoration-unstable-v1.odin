@@ -130,21 +130,21 @@ toplevel_decoration_v1_listener :: struct {
 
         A configure event can be sent at any time. The specified mode must be
         obeyed by the client. */
-	configure : proc "c" (data: rawptr, toplevel_decoration_v1: ^toplevel_decoration_v1, mode_: toplevel_decoration_v1_mode),
+	configure : proc "c" (data: rawptr, toplevel_decoration_v1_: ^toplevel_decoration_v1, mode_: toplevel_decoration_v1_mode),
 
 }
 toplevel_decoration_v1_add_listener :: proc "contextless" (toplevel_decoration_v1_: ^toplevel_decoration_v1, listener: ^toplevel_decoration_v1_listener, data: rawptr) {
 	proxy_add_listener(cast(^proxy)toplevel_decoration_v1_, cast(^generic_c_call)listener,data)
 }
 /*  */
-toplevel_decoration_v1_error :: enum {
+toplevel_decoration_v1_error :: enum u32 {
 	unconfigured_buffer = 0,
 	already_constructed = 1,
 	orphaned = 2,
 	invalid_mode = 3,
 }
 /* These values describe window decoration modes. */
-toplevel_decoration_v1_mode :: enum {
+toplevel_decoration_v1_mode :: enum u32 {
 	client_side = 1,
 	server_side = 2,
 }
@@ -180,3 +180,18 @@ init_interfaces_xdg_decoration_unstable_v1 :: proc "contextless" () {
 
 // Functions from libwayland-client
 import wl ".."
+fixed_t :: wl.fixed_t
+proxy :: wl.proxy
+message :: wl.message
+interface :: wl.interface
+array :: wl.array
+generic_c_call :: wl.generic_c_call
+proxy_add_listener :: wl.proxy_add_listener
+proxy_get_listener :: wl.proxy_get_listener
+proxy_get_user_data :: wl.proxy_get_user_data
+proxy_set_user_data :: wl.proxy_set_user_data
+proxy_get_version :: wl.proxy_get_version
+proxy_marshal :: wl.proxy_marshal
+proxy_marshal_flags :: wl.proxy_marshal_flags
+proxy_marshal_constructor :: wl.proxy_marshal_constructor
+proxy_destroy :: wl.proxy_destroy

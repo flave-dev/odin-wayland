@@ -370,9 +370,9 @@ linux_buffer_params_v1_error :: enum u32 {
 }
 /*  */
 linux_buffer_params_v1_flags :: enum u32 {
-	y_invert = 1,
-	interlaced = 2,
-	bottom_first = 4,
+	y_invert = 0,
+	interlaced = 1,
+	bottom_first = 2,
 }
 linux_buffer_params_v1_flags_flags :: bit_set[linux_buffer_params_v1_flags; u32]
 @(private)
@@ -557,7 +557,7 @@ linux_dmabuf_feedback_v1_add_listener :: proc "contextless" (linux_dmabuf_feedba
 }
 /*  */
 linux_dmabuf_feedback_v1_tranche_flags :: enum u32 {
-	scanout = 1,
+	scanout = 0,
 }
 linux_dmabuf_feedback_v1_tranche_flags_flags :: bit_set[linux_dmabuf_feedback_v1_tranche_flags; u32]
 @(private)
@@ -603,3 +603,18 @@ init_interfaces_linux_dmabuf_v1 :: proc "contextless" () {
 
 // Functions from libwayland-client
 import wl ".."
+fixed_t :: wl.fixed_t
+proxy :: wl.proxy
+message :: wl.message
+interface :: wl.interface
+array :: wl.array
+generic_c_call :: wl.generic_c_call
+proxy_add_listener :: wl.proxy_add_listener
+proxy_get_listener :: wl.proxy_get_listener
+proxy_get_user_data :: wl.proxy_get_user_data
+proxy_set_user_data :: wl.proxy_set_user_data
+proxy_get_version :: wl.proxy_get_version
+proxy_marshal :: wl.proxy_marshal
+proxy_marshal_flags :: wl.proxy_marshal_flags
+proxy_marshal_constructor :: wl.proxy_marshal_constructor
+proxy_destroy :: wl.proxy_destroy

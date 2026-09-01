@@ -1218,7 +1218,7 @@ data_device_manager_dnd_action :: enum u32 {
 	none = 0,
 	copy = 1,
 	move = 2,
-	ask = 4,
+	ask = 3,
 }
 data_device_manager_dnd_action_flags :: bit_set[data_device_manager_dnd_action; u32]
 @(private)
@@ -1819,9 +1819,9 @@ seat_add_listener :: proc "contextless" (seat_: ^seat, listener: ^seat_listener,
 /* This is a bitmask of capabilities this seat has; if a member is
 	set, then it is present on the seat. */
 seat_capability :: enum u32 {
-	pointer = 1,
-	keyboard = 2,
-	touch = 4,
+	pointer = 0,
+	keyboard = 1,
+	touch = 2,
 }
 seat_capability_flags :: bit_set[seat_capability; u32]
 /* These errors can be emitted in response to wl_seat requests. */
@@ -2701,8 +2701,8 @@ output_transform :: enum u32 {
 /* These flags describe properties of an output mode.
 	They are used in the flags bitfield of the mode event. */
 output_mode :: enum u32 {
-	current = 0x1,
-	preferred = 0x2,
+	current = 0,
+	preferred = 1,
 }
 output_mode_flags :: bit_set[output_mode; u32]
 @(private)

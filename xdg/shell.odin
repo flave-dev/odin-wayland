@@ -325,10 +325,10 @@ positioner_constraint_adjustment :: enum u32 {
 	none = 0,
 	slide_x = 1,
 	slide_y = 2,
-	flip_x = 4,
-	flip_y = 8,
-	resize_x = 16,
-	resize_y = 32,
+	flip_x = 3,
+	flip_y = 4,
+	resize_x = 5,
+	resize_y = 6,
 }
 positioner_constraint_adjustment_flags :: bit_set[positioner_constraint_adjustment; u32]
 @(private)

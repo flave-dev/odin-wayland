@@ -210,10 +210,10 @@ presentation_feedback_add_listener :: proc "contextless" (presentation_feedback_
         clients assess the reliability of the feedback and the visual
         quality with respect to possible tearing and timings. */
 presentation_feedback_kind :: enum u32 {
-	vsync = 0x1,
-	hw_clock = 0x2,
-	hw_completion = 0x4,
-	zero_copy = 0x8,
+	vsync = 0,
+	hw_clock = 1,
+	hw_completion = 2,
+	zero_copy = 3,
 }
 presentation_feedback_kind_flags :: bit_set[presentation_feedback_kind; u32]
 @(private)
