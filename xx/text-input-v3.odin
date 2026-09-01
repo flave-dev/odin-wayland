@@ -165,7 +165,7 @@ text_input_v3_set_text_change_cause :: proc "contextless" (text_input_v3_: ^text
         The initial value for hint is none, and the initial value for purpose
         is normal. */
 TEXT_INPUT_V3_SET_CONTENT_TYPE :: 5
-text_input_v3_set_content_type :: proc "contextless" (text_input_v3_: ^text_input_v3, hint_: text_input_v3_content_hint, purpose_: text_input_v3_content_purpose) {
+text_input_v3_set_content_type :: proc "contextless" (text_input_v3_: ^text_input_v3, hint_: text_input_v3_content_hint_flags, purpose_: text_input_v3_content_purpose) {
 	proxy_marshal_flags(cast(^proxy)text_input_v3_, TEXT_INPUT_V3_SET_CONTENT_TYPE, nil, proxy_get_version(cast(^proxy)text_input_v3_), 0, hint_, purpose_)
 }
 
@@ -243,7 +243,7 @@ text_input_v3_set_available_actions :: proc "contextless" (text_input_v3_: ^text
 
         The initial value for features is none. */
 TEXT_INPUT_V3_ANNOUNCE_SUPPORTED_FEATURES :: 9
-text_input_v3_announce_supported_features :: proc "contextless" (text_input_v3_: ^text_input_v3, features_: text_input_v3_supported_features) {
+text_input_v3_announce_supported_features :: proc "contextless" (text_input_v3_: ^text_input_v3, features_: text_input_v3_supported_features_flags) {
 	proxy_marshal_flags(cast(^proxy)text_input_v3_, TEXT_INPUT_V3_ANNOUNCE_SUPPORTED_FEATURES, nil, proxy_get_version(cast(^proxy)text_input_v3_), 0, features_)
 }
 
@@ -412,18 +412,19 @@ text_input_v3_change_cause :: enum {
 /* Content hint is a bitmask to allow to modify the behavior of the text
         input. */
 text_input_v3_content_hint :: enum {
-	none = 0x0,
-	completion = 0x1,
-	spellcheck = 0x2,
-	auto_capitalization = 0x4,
-	lowercase = 0x8,
-	uppercase = 0x10,
-	titlecase = 0x20,
-	hidden_text = 0x40,
-	sensitive_data = 0x80,
-	latin = 0x100,
-	multiline = 0x200,
+	none = 0,
+	completion = 1,
+	spellcheck = 2,
+	auto_capitalization = 3,
+	lowercase = 4,
+	uppercase = 5,
+	titlecase = 6,
+	hidden_text = 7,
+	sensitive_data = 8,
+	latin = 9,
+	multiline = 10,
 }
+text_input_v3_content_hint_flags :: bit_set[text_input_v3_content_hint; u32]
 /* The content purpose allows to specify the primary purpose of a text
         input.
 
@@ -458,9 +459,10 @@ text_input_v3_action :: enum {
         
         The flags match text-input protocol versions, but should be kept general enough to support other protocols. */
 text_input_v3_supported_features :: enum {
-	none = 0x0,
-	move_cursor = 0x1,
+	none = 0,
+	move_cursor = 1,
 }
+text_input_v3_supported_features_flags :: bit_set[text_input_v3_supported_features; u32]
 @(private)
 text_input_v3_requests := []message {
 	{"destroy", "", raw_data(xx_text_input_unstable_v3_types)[0:]},

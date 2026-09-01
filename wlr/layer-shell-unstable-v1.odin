@@ -11,7 +11,7 @@ wlr_layer_shell_unstable_v1_types := []^interface {
 	&wl.output_interface,
 	nil,
 	nil,
-	&popup_interface,
+	&xdg.popup_interface,
 }
 /* Clients can use this interface to assign the surface_layer role to
       wl_surfaces. Such surfaces are assigned to a "layer" of the output and
@@ -137,7 +137,7 @@ layer_surface_v1_set_size :: proc "contextless" (layer_surface_v1_: ^layer_surfa
 
         Anchor is double-buffered, see wl_surface.commit. */
 LAYER_SURFACE_V1_SET_ANCHOR :: 1
-layer_surface_v1_set_anchor :: proc "contextless" (layer_surface_v1_: ^layer_surface_v1, anchor_: layer_surface_v1_anchor) {
+layer_surface_v1_set_anchor :: proc "contextless" (layer_surface_v1_: ^layer_surface_v1, anchor_: layer_surface_v1_anchor_flags) {
 	proxy_marshal_flags(cast(^proxy)layer_surface_v1_, LAYER_SURFACE_V1_SET_ANCHOR, nil, proxy_get_version(cast(^proxy)layer_surface_v1_), 0, anchor_)
 }
 
@@ -215,7 +215,7 @@ layer_surface_v1_set_keyboard_interactivity :: proc "contextless" (layer_surface
         See the documentation of xdg_popup for more details about what an
         xdg_popup is and how it is used. */
 LAYER_SURFACE_V1_GET_POPUP :: 5
-layer_surface_v1_get_popup :: proc "contextless" (layer_surface_v1_: ^layer_surface_v1, popup_: ^popup) {
+layer_surface_v1_get_popup :: proc "contextless" (layer_surface_v1_: ^layer_surface_v1, popup_: ^xdg.popup) {
 	proxy_marshal_flags(cast(^proxy)layer_surface_v1_, LAYER_SURFACE_V1_GET_POPUP, nil, proxy_get_version(cast(^proxy)layer_surface_v1_), 0, popup_)
 }
 
@@ -262,7 +262,7 @@ layer_surface_v1_set_layer :: proc "contextless" (layer_surface_v1_: ^layer_surf
         The edge must be one the surface is anchored to, otherwise the
         invalid_exclusive_edge protocol error will be raised. */
 LAYER_SURFACE_V1_SET_EXCLUSIVE_EDGE :: 9
-layer_surface_v1_set_exclusive_edge :: proc "contextless" (layer_surface_v1_: ^layer_surface_v1, edge_: layer_surface_v1_anchor) {
+layer_surface_v1_set_exclusive_edge :: proc "contextless" (layer_surface_v1_: ^layer_surface_v1, edge_: layer_surface_v1_anchor_flags) {
 	proxy_marshal_flags(cast(^proxy)layer_surface_v1_, LAYER_SURFACE_V1_SET_EXCLUSIVE_EDGE, nil, proxy_get_version(cast(^proxy)layer_surface_v1_), 0, edge_)
 }
 
@@ -320,11 +320,12 @@ layer_surface_v1_error :: enum {
 }
 /*  */
 layer_surface_v1_anchor :: enum {
-	top = 1,
-	bottom = 2,
-	left = 4,
-	right = 8,
+	top = 0,
+	bottom = 1,
+	left = 2,
+	right = 3,
 }
+layer_surface_v1_anchor_flags :: bit_set[layer_surface_v1_anchor; u32]
 @(private)
 layer_surface_v1_requests := []message {
 	{"set_size", "uu", raw_data(wlr_layer_shell_unstable_v1_types)[0:]},
@@ -365,6 +366,7 @@ init_interfaces_wlr_layer_shell_unstable_v1 :: proc "contextless" () {
 
 // Functions from libwayland-client
 import wl ".."
+import xdg "../xdg"
 fixed_t :: wl.fixed_t
 proxy :: wl.proxy
 message :: wl.message

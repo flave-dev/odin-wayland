@@ -180,18 +180,3 @@ init_interfaces_xdg_decoration_unstable_v1 :: proc "contextless" () {
 
 // Functions from libwayland-client
 import wl ".."
-fixed_t :: wl.fixed_t
-proxy :: wl.proxy
-message :: wl.message
-interface :: wl.interface
-array :: wl.array
-generic_c_call :: wl.generic_c_call
-proxy_add_listener :: wl.proxy_add_listener
-proxy_get_listener :: wl.proxy_get_listener
-proxy_get_user_data :: wl.proxy_get_user_data
-proxy_set_user_data :: wl.proxy_set_user_data
-proxy_get_version :: wl.proxy_get_version
-proxy_marshal :: wl.proxy_marshal
-proxy_marshal_flags :: wl.proxy_marshal_flags
-proxy_marshal_constructor :: wl.proxy_marshal_constructor
-proxy_destroy :: wl.proxy_destroy
