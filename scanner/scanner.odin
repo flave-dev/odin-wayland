@@ -332,9 +332,10 @@ parse_file :: proc(filename: string) -> Protocol {
                // We want to skip entries that are not a single bit for bitfield.
                // added because of resize in wayland.xml but it's deprecated and not parsed
                v, ok := strconv.parse_uint(value)
-               if ok && (v == 0 || (v & (v-1))==0){
+               if ok && ((v & (v-1)) == 0){
                   // odin use the enum value to place it in the bit field
-                  // so we need to change it from 0,1,2,4 to 0,1,2,3 to get the correct value in the end
+                  // so we need to change it from 0,1,2,4 to 1,2,3 to get the correct value in the end,
+                  // we also remove none = 0 because it become {} (empty bit_set)
                   entry.value = fmt.aprint(len(entries))
                   append(&entries, entry)
                   log.debug("\t\tEntry:", entry.name)
